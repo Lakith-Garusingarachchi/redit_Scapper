@@ -1,0 +1,11 @@
+services:
+  reddit-explorer:
+    build: .
+    container_name: reddit_thread_explorer
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app_root/data
+    restart: unless-stopped
