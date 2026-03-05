@@ -3,3 +3,6 @@ uvicorn[standard]
 asyncpraw
 groq
 python-dotenv
+aiosmtplib
+email-validator
+python-multipart

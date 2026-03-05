@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import scrape, summarize
+from app.routes import scrape, summarize, email
 
 app = FastAPI(
     title="Reddit Thread Explorer",
@@ -9,6 +9,7 @@ app = FastAPI(
 
 app.include_router(scrape.router)
 app.include_router(summarize.router)
+app.include_router(email.router)
 
 
 @app.get("/")
@@ -19,6 +20,8 @@ async def root():
             "scrape": "POST /scrape/",
             "summarize_communities": "POST /summarize/communities",
             "summarize_threads": "POST /summarize/threads",
+            "send_single_email": "POST /email/send",
+            "send_bulk_email": "POST /email/bulk",
             "docs": "/docs",
         },
     }
