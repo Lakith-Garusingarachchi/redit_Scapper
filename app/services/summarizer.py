@@ -5,7 +5,7 @@ from app.models.reddit import Community, Thread
 
 load_dotenv()
 
-GROQ_MODEL = "llama3-8b-8192"
+GROQ_MODEL = "openai/gpt-oss-120b"
 
 
 def get_groq_client() -> Groq:

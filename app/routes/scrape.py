@@ -13,7 +13,7 @@ router = APIRouter(prefix="/scrape", tags=["scrape"])
 @router.post("/", response_model=ScrapeResponse)
 async def scrape(request: ScrapeRequest):
     try:
-        communities = scrape_reddit(
+        communities = await scrape_reddit(
             category=request.category,
             max_communities=request.max_communities,
             max_threads=request.max_threads,

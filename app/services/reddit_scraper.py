@@ -1,31 +1,33 @@
 import os
-import praw
+import asyncpraw
 from dotenv import load_dotenv
 from app.models.reddit import Community, Thread, Comment
 
 load_dotenv()
 
 
-def get_reddit_client() -> praw.Reddit:
-    return praw.Reddit(
+def get_reddit_client() -> asyncpraw.Reddit:
+    return asyncpraw.Reddit(
         client_id=os.getenv("REDDIT_CLIENT_ID"),
         client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
         user_agent=os.getenv("REDDIT_USER_AGENT", "RedditThreadExplorer/1.0"),
     )
 
 
-def scrape_reddit(category: str, max_communities: int = 5, max_threads: int = 20) -> list[Community]:
+async def scrape_reddit(category: str, max_communities: int = 5, max_threads: int = 20) -> list[Community]:
     reddit = get_reddit_client()
     communities = []
 
-    for subreddit in reddit.subreddits.search(category, limit=max_communities):
+    async for subreddit in reddit.subreddits.search(category, limit=max_communities):
         threads = []
 
-        for submission in subreddit.hot(limit=max_threads):
-            submission.comments.replace_more(limit=0)
+        async for submission in subreddit.hot(limit=max_threads):
+            await submission.load()
+            comments = await submission.comments()
+            await comments.replace_more(limit=0)
 
             top_comments = []
-            for comment in list(submission.comments)[:5]:
+            for comment in list(comments)[:5]:
                 if hasattr(comment, "body") and comment.body not in ("[deleted]", "[removed]"):
                     top_comments.append(
                         Comment(
@@ -58,4 +60,5 @@ def scrape_reddit(category: str, max_communities: int = 5, max_threads: int = 20
             )
         )
 
+    await reddit.close()
     return communities

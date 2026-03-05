@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, model_validator
+from typing import List, Literal, Optional
 
 
 class Comment(BaseModel):
@@ -43,4 +43,11 @@ class ScrapeResponse(BaseModel):
 
 
 class SummarizeRequest(BaseModel):
-    file_path: str
+    mode: Literal["all", "specific"] = "all"
+    file_name: Optional[str] = None  # e.g. "astrology_20260305_091808.json" — only for mode="specific"
+
+    @model_validator(mode="after")
+    def file_name_required_for_specific(self):
+        if self.mode == "specific" and not self.file_name:
+            raise ValueError("file_name is required when mode is 'specific'")
+        return self
